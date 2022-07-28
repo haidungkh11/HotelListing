@@ -117,11 +117,20 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="COMFIRMED_SUCCESS" xml:space="preserve">
+    <value>Xác nhận thành công</value>
+  </data>
   <data name="CREATE_SUCCESS" xml:space="preserve">
     <value>Tạo thành công</value>
   </data>
   <data name="DELETE_SUCCESS" xml:space="preserve">
     <value>Xóa thành công</value>
+  </data>
+  <data name="FORGOT_PASSWORD_BODY" xml:space="preserve">
+    <value>Quên mật khẩu</value>
+  </data>
+  <data name="FORGOT_PASSWORD_SUCCESS" xml:space="preserve">
+    <value>Vào mail để lấy link thay đổi mật khẩu</value>
   </data>
   <data name="GET_SUCCESS" xml:space="preserve">
     <value>Thành công</value>
@@ -129,11 +138,41 @@
   <data name="LOGIN_FAIL" xml:space="preserve">
     <value>Đăng nhập thất bại</value>
   </data>
+  <data name="LOGIN_SUCCESS" xml:space="preserve">
+    <value>Đăng nhập thành công</value>
+  </data>
+  <data name="LOGOUT_FAIL" xml:space="preserve">
+    <value>Đăng xuất thất bại</value>
+  </data>
+  <data name="LOGOUT_SUCCESS" xml:space="preserve">
+    <value>Đăng xuất thành công</value>
+  </data>
+  <data name="NOT_ACCOUNT" xml:space="preserve">
+    <value>Tài khoản không tồn tại</value>
+  </data>
   <data name="NOT_DATA" xml:space="preserve">
     <value>Không có dữ liệu</value>
   </data>
+  <data name="NOT_TOKEN" xml:space="preserve">
+    <value>Không có mã</value>
+  </data>
+  <data name="REGISTER_SUCCESS" xml:space="preserve">
+    <value>Đăng kí thành công</value>
+  </data>
+  <data name="RESETPASSWORD_SUCCESS" xml:space="preserve">
+    <value>Thay đổi mật khẩu thành công</value>
+  </data>
+  <data name="SEND_MAIL_CONFIRMED" xml:space="preserve">
+    <value>Xác nhận địa chỉ Email</value>
+  </data>
+  <data name="SEND_MAIL_CONFIRMED_BODY" xml:space="preserve">
+    <value>Xác nhận Email bằng cách ấn vào link sau</value>
+  </data>
   <data name="UPDATE_SUCCESS" xml:space="preserve">
     <value>Cập nhật thành công</value>
+  </data>
+  <data name="VALIDATION_COMPARE" xml:space="preserve">
+    <value>{0} phải có dạng giống nhau</value>
   </data>
   <data name="VALIDATION_DISPLAY" xml:space="preserve">
     <value>Phải đúng dạng của {0}</value>

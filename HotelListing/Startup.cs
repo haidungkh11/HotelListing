@@ -1,12 +1,15 @@
-using AspNetCoreRateLimit;
+﻿using AspNetCoreRateLimit;
+using FluentValidation.AspNetCore;
 using HotelListing.Configurations;
 using HotelListing.Data;
+using HotelListing.Gmail;
 using HotelListing.IRespository;
 using HotelListing.Respository;
 using HotelListing.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -14,10 +17,15 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
+using SendGrid.Helpers.Mail;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using FluentValidation;
+using AutoMapper;
+using Microsoft.AspNetCore.Http;
+using MailSettings = HotelListing.Gmail.MailSettings;
 
 namespace HotelListing
 {
@@ -39,7 +47,7 @@ namespace HotelListing
             );
             services.AddMemoryCache();
             services.ConfigureRateLimiting();
-
+            services.AddSingleton<HttpContextAccessor>();
             services.AddHttpContextAccessor();
             services.ConfigureHttpCacheHeaders();
             services.AddAuthentication();
@@ -53,6 +61,12 @@ namespace HotelListing
                 .AllowAnyMethod()
                 .AllowAnyHeader());
             });
+            //Đăng kí dịch vụ Gmail
+            services.AddOptions();
+            var mailsettings = Configuration.GetSection("MailSettings");
+            services.Configure<MailSettings>(mailsettings);
+            services.AddTransient<ISendMailService, SendMailService>();
+
             services.AddSingleton<IProcessingStrategy, AsyncKeyLockProcessingStrategy>();
             services.AddAutoMapper(typeof(MapperInitilizer));
             services.AddScoped<IAuthManager, AuthManager>();
@@ -66,14 +80,24 @@ namespace HotelListing
                     Duration = 120
 
                 });
-            }).AddNewtonsoftJson(op => 
+            }).AddNewtonsoftJson(op =>
             op.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore);
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "HotelListing", Version = "v1" });
             });
             services.ConfigureVersioning();
+            services.AddControllers().AddNewtonsoftJson(op =>
+                op.SerializerSettings.ReferenceLoopHandling =
+                    Newtonsoft.Json.ReferenceLoopHandling.Ignore).AddFluentValidation();
+            services.Configure<IdentityOptions>(options =>
+            {
+                options.User.RequireUniqueEmail = true;
+                // Cấu hình đăng nhập.
+                options.SignIn.RequireConfirmedEmail = true;
+                options.SignIn.RequireConfirmedPhoneNumber = false;
 
+            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

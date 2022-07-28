@@ -125,6 +125,7 @@ namespace HotelListing
             services.AddTransient<IValidator<UserDTO>, UserValidation>();
             services.AddTransient<IValidator<CreatHotelDTO>, HotelValidation>();
             services.AddTransient<IValidator<CreatCountryDTO>, CountryValidation>();
+            services.AddTransient<IValidator<ResetPassword>, ResetPasswordValidation>();
         }
     }
 }

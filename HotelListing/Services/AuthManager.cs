@@ -1,12 +1,17 @@
-﻿using HotelListing.Data;
+﻿using AutoMapper;
+using HotelListing.Data;
+using HotelListing.Gmail;
 using HotelListing.Models;
 using HotelListing.Properties;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using System;
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
+using System.Linq;
 using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
@@ -19,10 +24,17 @@ namespace HotelListing.Services
         private ApiUser _user;
         private readonly UserManager<ApiUser> _userManager;
         private readonly IConfiguration _configuration;
-        public AuthManager(UserManager<ApiUser> userManager, IConfiguration configuration)
+        private readonly IMapper _mapper;
+        private readonly ISendMailService _emailSender;
+        private readonly IHttpContextAccessor _httpContextAccessor;
+        public AuthManager(UserManager<ApiUser> userManager, IConfiguration configuration, IMapper mapper, ISendMailService emailSender,
+            IHttpContextAccessor httpContextAccessor)
         {
             _userManager = userManager;
             _configuration = configuration;
+            _mapper = mapper;
+            _emailSender = emailSender;
+            _httpContextAccessor = httpContextAccessor;
         }
         public async Task<string> CreateToken()
         {
@@ -42,8 +54,7 @@ namespace HotelListing.Services
                 issuer: jwtSettings.GetSection("Issuer").Value,
                 claims: claims,
                 expires: expiration,
-                signingCredentials: signingCredentials
-                );
+                signingCredentials: signingCredentials);
 
             return token;
         }
@@ -83,7 +94,113 @@ namespace HotelListing.Services
             }
             throw new BusinessException(Resource.LOGIN_FAIL);
         }
+        public async Task<bool> Register(UserDTO userDTO)
+        {
+            var user = _mapper.Map<ApiUser>(userDTO);
+            user.UserName = userDTO.Email;
+            var result = await _userManager.CreateAsync(user, userDTO.Password);
 
+            if (!result.Succeeded)
+            {
+                List<string> error = new List<string>();
+                foreach (var e in result.Errors)
+                {
+                    error.Add(e.Description);
+                }
+                throw new BusinessException(error[0]);
+            }
+            var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
+
+            code = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));
+            var callbackUrl = string.Format($"/api/Account/ConfirmedEmail?id={user.Id}&code={code}");
+
+            await _emailSender.SendEmailAsync(userDTO.Email, Resource.SEND_MAIL_CONFIRMED,
+                        string.Format(Resource.SEND_MAIL_CONFIRMED_BODY, callbackUrl));
+            await _userManager.AddToRolesAsync(user, userDTO.Roles);
+
+            return true;
+        }
+        public async Task<string> Logout()
+        {
+            var identity = (ClaimsIdentity)_httpContextAccessor.HttpContext.User.Identity;
+
+            //Gets list of claims.
+            IEnumerable<Claim> claims = identity.Claims;
+
+            var usernameClaim = claims
+                .Where(x => x.Type == ClaimTypes.Name)
+                .FirstOrDefault();
+
+            var user = await _userManager.FindByNameAsync(usernameClaim.Value);
+            var result = await _userManager.RemoveAuthenticationTokenAsync(user, "Web", "Access");
+            if (result.Succeeded)
+            {
+                return Resource.LOGOUT_SUCCESS;
+            }
+            throw new BusinessException(Resource.LOGOUT_FAIL);
+        }
+        public async Task<string> ConfirmedEmail(Guid id, string key)
+        {
+            List<string> error = new List<string>();
+            var user = await _userManager.FindByIdAsync(id.ToString());
+            var code = Encoding.UTF8.GetString(WebEncoders.Base64UrlDecode(key));
+            var result = await _userManager.ConfirmEmailAsync(user, code);
+            if (result.Succeeded)
+            {
+
+                return Resource.COMFIRMED_SUCCESS;
+            }
+            else
+            {
+                foreach (var e in result.Errors)
+                {
+                    error.Add(e.Description);
+                }
+                throw new BusinessException(error[0]);
+            }
+        }
+        public async Task<string> ForgotPassword(string mail)
+        {
+            var user = await _userManager.FindByEmailAsync(mail);
+            if (user == null || !(await _userManager.IsEmailConfirmedAsync(user)))
+            {
+                return Resource.FORGOT_PASSWORD_SUCCESS;
+            }
+            var code = await _userManager.GeneratePasswordResetTokenAsync(user);
+            code = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));
+            var callbackUrl = string.Format($"/api/Account/resetPassword?code={code}");
+            await _emailSender.SendEmailAsync(user.Email, Resource.FORGOT_PASSWORD_BODY,
+                    string.Format(Resource.FORGOT_PASSWORD_BODY, callbackUrl));
+            throw new BusinessException(Resource.FORGOT_PASSWORD_SUCCESS);
+        }
+        public async Task<string> ResetPassword(string key, ResetPassword resetPassword)
+        {
+            if (key == null)
+            {
+                throw new BusinessException(Resource.NOT_TOKEN);
+            }
+
+            var user = await _userManager.FindByEmailAsync(resetPassword.Email);
+            if (user == null)
+            {
+                throw new BusinessException(Resource.NOT_ACCOUNT);
+            }
+            var code = Encoding.UTF8.GetString(WebEncoders.Base64UrlDecode(key));
+            var result = await _userManager.ResetPasswordAsync(user, code, resetPassword.Password);
+            List<string> error = new List<string>();
+            if (result.Succeeded)
+            {
+                return Resource.RESETPASSWORD_SUCCESS;
+            }
+            else
+            {
+                foreach (var e in result.Errors)
+                {
+                    error.Add(e.Description);
+                }
+            }
+            throw new BusinessException(error[0]);
+        }
     }
 
 }

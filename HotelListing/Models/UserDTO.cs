@@ -14,9 +14,16 @@ namespace HotelListing.Models
     {
         public string FirstName { get; set; }
         public string LastName { get; set; }
-        [DataType(DataType.PhoneNumber)]
+        
         public string PhoneNumber { get; set; }
         public ICollection<string> Roles { get; set; }
         
+    }
+    public class ResetPassword
+    {
+        public string Email { get; set; }
+        public string Password { get; set; }
+        public string ConfirmPassword { get; set; }
+
     }
 }

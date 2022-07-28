@@ -61,6 +61,15 @@ namespace HotelListing.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Xác nhận thành công.
+        /// </summary>
+        public static string COMFIRMED_SUCCESS {
+            get {
+                return ResourceManager.GetString("COMFIRMED_SUCCESS", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Tạo thành công.
         /// </summary>
         public static string CREATE_SUCCESS {
@@ -75,6 +84,24 @@ namespace HotelListing.Properties {
         public static string DELETE_SUCCESS {
             get {
                 return ResourceManager.GetString("DELETE_SUCCESS", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Quên mật khẩu.
+        /// </summary>
+        public static string FORGOT_PASSWORD_BODY {
+            get {
+                return ResourceManager.GetString("FORGOT_PASSWORD_BODY", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Vào mail để lấy link thay đổi mật khẩu.
+        /// </summary>
+        public static string FORGOT_PASSWORD_SUCCESS {
+            get {
+                return ResourceManager.GetString("FORGOT_PASSWORD_SUCCESS", resourceCulture);
             }
         }
         
@@ -97,6 +124,42 @@ namespace HotelListing.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Đăng nhập thành công.
+        /// </summary>
+        public static string LOGIN_SUCCESS {
+            get {
+                return ResourceManager.GetString("LOGIN_SUCCESS", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Đăng xuất thất bại.
+        /// </summary>
+        public static string LOGOUT_FAIL {
+            get {
+                return ResourceManager.GetString("LOGOUT_FAIL", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Đăng xuất thành công.
+        /// </summary>
+        public static string LOGOUT_SUCCESS {
+            get {
+                return ResourceManager.GetString("LOGOUT_SUCCESS", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Tài khoản không tồn tại.
+        /// </summary>
+        public static string NOT_ACCOUNT {
+            get {
+                return ResourceManager.GetString("NOT_ACCOUNT", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Không có dữ liệu.
         /// </summary>
         public static string NOT_DATA {
@@ -106,11 +169,65 @@ namespace HotelListing.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Không có mã.
+        /// </summary>
+        public static string NOT_TOKEN {
+            get {
+                return ResourceManager.GetString("NOT_TOKEN", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Đăng kí thành công.
+        /// </summary>
+        public static string REGISTER_SUCCESS {
+            get {
+                return ResourceManager.GetString("REGISTER_SUCCESS", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Thay đổi mật khẩu thành công.
+        /// </summary>
+        public static string RESETPASSWORD_SUCCESS {
+            get {
+                return ResourceManager.GetString("RESETPASSWORD_SUCCESS", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Xác nhận địa chỉ Email.
+        /// </summary>
+        public static string SEND_MAIL_CONFIRMED {
+            get {
+                return ResourceManager.GetString("SEND_MAIL_CONFIRMED", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Xác nhận Email bằng cách ấn vào link sau.
+        /// </summary>
+        public static string SEND_MAIL_CONFIRMED_BODY {
+            get {
+                return ResourceManager.GetString("SEND_MAIL_CONFIRMED_BODY", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Cập nhật thành công.
         /// </summary>
         public static string UPDATE_SUCCESS {
             get {
                 return ResourceManager.GetString("UPDATE_SUCCESS", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to {0} phải có dạng giống nhau.
+        /// </summary>
+        public static string VALIDATION_COMPARE {
+            get {
+                return ResourceManager.GetString("VALIDATION_COMPARE", resourceCulture);
             }
         }
         

@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using HotelListing.Data;
 using HotelListing.Models;
+using HotelListing.Properties;
 using HotelListing.Services;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
@@ -15,16 +16,11 @@ namespace HotelListing.Controllers
     [ApiController]
     public class AccountController : ControllerBase
     {
-        private readonly UserManager<ApiUser> _userManager;
-        private readonly ILogger<AccountController> _logger;
-        private readonly IMapper _mapper;
+        
         private readonly IAuthManager _authManager; 
-        public AccountController(UserManager<ApiUser> userManager,
-            ILogger<AccountController> logger, IMapper mapper, IAuthManager authManager)
+        public AccountController(IAuthManager authManager)
         {
-            _userManager = userManager;
-            _logger = logger;
-            _mapper = mapper;
+            
             _authManager = authManager;
         }
         [HttpPost]
@@ -34,26 +30,9 @@ namespace HotelListing.Controllers
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> Register([FromBody] UserDTO userDTO)
         {
-            _logger.LogInformation($"Registration Attemp for {userDTO.Email}");
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
-            
-             var user = _mapper.Map<ApiUser>(userDTO);
-             user.UserName = userDTO.Email;
-             var result = await _userManager.CreateAsync(user);
-             if (!result.Succeeded)
-             {
-                foreach(var error in result.Errors)
-                {
-                    ModelState.AddModelError(error.Code, error.Description);
-                }
-                 return BadRequest(ModelState);
-             }
-              await _userManager.AddToRolesAsync(user, userDTO.Roles);
-              return Accepted();
-            
+            var result = await _authManager.Register(userDTO);
+            return Ok(new Response(Resource.REGISTER_SUCCESS));
+
         }
         [HttpPost]
         [Route("Login")]
@@ -63,20 +42,39 @@ namespace HotelListing.Controllers
 
         public async Task<IActionResult> Login([FromBody] LoginUserDTO userDTO)
         {
-            _logger.LogInformation($"Login Attemp for {userDTO.Email}");
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
-            
-             if (await _authManager.Login(userDTO) == null)
-             {
-                return Accepted(new { Token = await _authManager.CreateToken() });
-             }
-              return Unauthorized();
+            var result = await _authManager.Login(userDTO);
+            return Ok(new Response(Resource.LOGIN_SUCCESS, null, new { Token = result }));
 
-            
-           
+
+        }
+        [HttpGet("logout")]
+        public async Task<IActionResult> Logout()
+        {
+            var result = await _authManager.Logout();
+            return Ok(new Response(result));
+        }
+        [HttpGet]
+        [Route("ConfirmedEmail")]
+        public async Task<IActionResult> ConfirmedEmail(Guid id, string code)
+        {
+            var result = await _authManager.ConfirmedEmail(id, code);
+            return Ok(new Response(result));
+        }
+
+        [HttpPost]
+        [Route("forgotPassword")]
+        public async Task<IActionResult> ForgotPassword(string mail)
+        {
+            var result = await _authManager.ForgotPassword(mail);
+            return Ok(new Response(result));
+        }
+
+        [HttpPost]
+        [Route("resetPassword")]
+        public async Task<IActionResult> ResetPassword([FromQuery] string code, [FromBody] ResetPassword resetPassword)
+        {
+            var result = await _authManager.ResetPassword(code, resetPassword);
+            return Ok(new Response(result));
         }
     }
 
